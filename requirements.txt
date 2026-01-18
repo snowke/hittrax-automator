@@ -1,2 +1,4 @@
 google-genai
 pillow
+streamlit
+gspread

@@ -26,7 +26,7 @@ def analyze_hittrax_image(image_path, client, model_name):
 
     Logic Rule: If '10U' is found, set player='Caden' and bat='CatX 29"'. If '8U' is found, set player='Lucas' and bat='Cat7 27"'.
 
-    Output the result strictly as a JSON object.
+    Output the result strictly as a JSON object. Ensure 'age_category' is a key in the output (e.g., '10U', '8U', or 'Unknown').
     """
 
     try:

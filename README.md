@@ -21,7 +21,9 @@ Automating the extraction of baseball statistics from HitTrax session images usi
         {
             "project_id": "your-project-id",
             "location": "us-central1",
-            "service_account_file": "path/to/your-key.json"
+            "service_account_file": "path/to/your-key.json",
+            "model_name": "gemini-2.5-pro",
+            "sheet_id": "your-google-sheet-id"
         }
         ```
 
@@ -32,5 +34,6 @@ Automating the extraction of baseball statistics from HitTrax session images usi
 
 ## Usage
 
+*   **Streamlit App**: `streamlit run app.py` for the web interface.
 *   **Test Parser**: Run `python test_parser.py` to process images in `test/images/`.
 *   **Main**: `python main.py` (Currently allows integration into other scripts).
