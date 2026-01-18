@@ -1,17 +1,17 @@
 import glob
 import os
-import vertexai
-from vertexai.generative_models import GenerativeModel
 from main import analyze_hittrax_image, initialize_application
 
 def main():
     print("Starting Test Parser...")
     
     # 1. Initialize Application (Loads credentials & Model)
-    model = initialize_application()
-    if not model:
+    init_result = initialize_application()
+    if not init_result:
         print("Failed to initialize application.")
         return
+    
+    client, model_name = init_result
 
     # 3. Find Images
     # Looking in ./test/images/ for any .jpg files
@@ -30,7 +30,7 @@ def main():
         print(f"="*40)
         print(f"Processing: {img_path}")
         try:
-            result_json = analyze_hittrax_image(img_path, model)
+            result_json = analyze_hittrax_image(img_path, client, model_name)
             print("Result:")
             print(result_json)
         except Exception as e:

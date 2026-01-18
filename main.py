@@ -1,9 +1,10 @@
-import vertexai
-from vertexai.generative_models import GenerativeModel, Part
+from google import genai
+from google.genai import types
 import scripts.get_credentials as gc
 import os
+import PIL.Image
 
-def analyze_hittrax_image(image_path, model):
+def analyze_hittrax_image(image_path, client, model_name):
     """
     Analyzes a HitTrax image using Gemini to extract statistics.
     """
@@ -12,10 +13,7 @@ def analyze_hittrax_image(image_path, model):
     if not os.path.exists(image_path):
         return f"Error: Image not found at {image_path}"
 
-    with open(image_path, "rb") as f:
-        image_data = f.read()
-
-    image_part = Part.from_data(data=image_data, mime_type="image/jpeg")
+    image = PIL.Image.open(image_path)
     
     prompt = """
     You are a data extraction specialist for youth baseball statistics. Look at the provided HitTrax image.
@@ -32,7 +30,10 @@ def analyze_hittrax_image(image_path, model):
     """
 
     try:
-        response = model.generate_content([prompt, image_part])
+        response = client.models.generate_content(
+            model=model_name,
+            contents=[prompt, image]
+        )
         text = response.text
         # Clean up code fences if Gemini adds them
         if text.startswith("```json"):
@@ -45,8 +46,8 @@ def analyze_hittrax_image(image_path, model):
 
 def initialize_application():
     """
-    Loads credentials, configures authentication, and initializes Vertex AI.
-    Returns the initialized GenerativeModel or None on failure.
+    Loads credentials, configures authentication, and initializes Vertex AI Client.
+    Returns (client, model_name) or None on failure.
     """
     creds = gc.get_credentials()
     if not creds:
@@ -65,22 +66,22 @@ def initialize_application():
         print(f"Setting credentials from: {service_account_file}")
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = service_account_file
     
-    print(f"Initializing Vertex AI with project: {project_id}, location: {location}")
+    print(f"Initializing Vertex AI Client with project: {project_id}, location: {location}")
     print(f"Using model: {model_name}")
     
     try:
-        vertexai.init(project=project_id, location=location)
-        model = GenerativeModel(model_name)
-        return model
+        client = genai.Client(vertexai=True, project=project_id, location=location)
+        return client, model_name
     except Exception as e:
-        print(f"Failed to initialize Vertex AI: {e}")
+        print(f"Failed to initialize Vertex AI Client: {e}")
         return None
 
 def main():
-    model = initialize_application()
-    if not model:
+    result = initialize_application()
+    if not result:
         return
-        
+    
+    client, model_name = result
     print("Application initialized successfully. Ready to analyze.")
 
 if __name__ == "__main__":
